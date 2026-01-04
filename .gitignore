@@ -1,33 +1,31 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# === OS ===
+.DS_Store
+Thumbs.db
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# === Logs ===
+*.log
+logs/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# === Environnements / secrets ===
+.env
+.env.*
+!.env.example
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# === Dépendances ===
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+
+# === Build / dist ===
+dist/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+out/
 
-### VS Code ###
+# === IDE / éditeurs ===
 .vscode/
+.idea/
+*.swp
+
+# === Git ===
+.gitignore
