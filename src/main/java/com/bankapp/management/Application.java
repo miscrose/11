@@ -21,7 +21,7 @@ public class Application {
     CommandLineRunner start(AccountRepository accountRepository, RepositoryRestConfiguration restConfiguration) {
         return args -> {
             restConfiguration.exposeIdsFor(Account.class);
-            // Initialize sample accounts with random balances
+          
             accountRepository.save(new Account(null, Math.random()*10000, new Date(), AccountType.SAVINGS));
             accountRepository.save(new Account(null, Math.random()*10000, new Date(), AccountType.CHECKING));
             accountRepository.save(new Account(null, Math.random()*10000, new Date(), AccountType.SAVINGS));
