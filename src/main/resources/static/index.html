@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Account Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Bank Account Management</h1>
+        
+        <!-- Accounts List -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Accounts</h2>
+            </div>
+            <div class="card-body">
+                <button id="loadAccounts" class="btn btn-primary mb-3">Load Accounts</button>
+                <div id="accountsList"></div>
+            </div>
+        </div>
+        
+        <!-- Add New Account Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Add New Account</h2>
+            </div>
+            <div class="card-body">
+                <form id="accountForm">
+                    <div class="mb-3">
+                        <label for="balance" class="form-label">Balance:</label>
+                        <input type="number" class="form-control" id="balance" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Account Type:</label>
+                        <select class="form-select" id="type" required>
+                            <option value="CHECKING">Current</option>
+                            <option value="SAVINGS">Savings</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api/accounts';
+        
+        // Load accounts function
+        async function loadAccounts() {
+            try {
+                const response = await fetch(API_BASE_URL);
+                const data = await response.json();
+                displayAccounts(data._embedded.accounts);
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                document.getElementById('accountsList').innerHTML = '<div class="alert alert-danger">Error loading accounts</div>';
+            }
+        }
+        
+        // Display accounts in the UI
+        function displayAccounts(accounts) {
+            const accountsList = document.getElementById('accountsList');
+            
+            if (!accounts || accounts.length === 0) {
+                accountsList.innerHTML = '<div class="alert alert-info">No accounts found</div>';
+                return;
+            }
+            
+            let html = '<div class="row">';
+            accounts.forEach(account => {
+                html += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Account #${account.id}</h5>
+                                <p class="card-text">
+                                    <strong>Balance:</strong> $${account.balance.toFixed(2)}<br>
+                                    <strong>Type:</strong> ${account.type}<br>
+                                    <strong>Created:</strong> ${new Date(account.creationDate).toLocaleDateString()}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            accountsList.innerHTML = html;
+        }
+        
+        // Add new account function
+        async function addAccount(event) {
+            event.preventDefault();
+            
+            const balance = document.getElementById('balance').value;
+            const type = document.getElementById('type').value;
+            
+            const accountData = {
+                balance: parseFloat(balance),
+                type: type,
+                creationDate: new Date().toISOString().split('T')[0]
+            };
+            
+            try {
+                const response = await fetch(API_BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(accountData)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('accountForm').reset();
+                    loadAccounts(); // Refresh the accounts list
+                    alert('Account added successfully!');
+                } else {
+                    throw new Error('Failed to add account');
+                }
+            } catch (error) {
+                console.error('Error adding account:', error);
+                alert('Error adding account');
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('loadAccounts').addEventListener('click', loadAccounts);
+        document.getElementById('accountForm').addEventListener('submit', addAccount);
+        
+        // Load accounts on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAccounts();
+        });
+    </script>
+</body>
+</html>
